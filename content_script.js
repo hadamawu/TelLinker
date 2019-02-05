@@ -98,7 +98,14 @@ function handleNode(node) {
                     link.href = "javascript:void(0);";
                     link.appendChild(document.createTextNode(formattedPhoneText));
                     link.title = "Call: " + formattedPhoneText;
-                    link.onclick = function() { DoCall(settings.telLinkFormat.startsWith("http") ? encodeURI(formattedPhoneNumber) : formattedPhoneNumber); };
+                    link.onclick = function() { 
+                        if (settings.telLinkFormat.startsWith("http")) {
+                            var url = new URL(formattedPhoneNumber);
+                            DoCall(url.toString());
+                        } else {
+                            DoCall(formattedPhoneNumber);
+                        }
+                    };
                     newNode.appendChild(link);
                 }
             }
