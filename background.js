@@ -46,6 +46,7 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             if (parts.length > 0) {
                 urlString += "?";
                 for (var i = 0; i < parts.length; i+=2) {
+                    if (i > 0) urlString += "&";
                     urlString += parts[i] + "=" + encodeURIComponent(parts[i+1]);
                 }
             }
