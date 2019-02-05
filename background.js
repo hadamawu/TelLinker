@@ -12,7 +12,7 @@ chrome.runtime.onInstalled.addListener(function() {
         linkTextFormat: "{0}",
         ignoredDomains: [],
         ignoredURLS: [],
-        matchPatterns: [ "/([\s:]|\d+(?:-|\.)|^)\(?(\d{3})\)?[- \.]?(\d{3})[- \.]?(\d{4})(?=<|\s|$)/g" ]
+        matchPatterns: [ "(?:[\\s:]|\\d+(?:-|\\.)|^)\\(?(\\d{3})\\)?[- \\.]?(\\d{3})[- \\.]?(\\d{4})(?=<|\\s|$)" ]
     });
 });
 
