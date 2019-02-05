@@ -55,7 +55,7 @@ chrome.storage.local.get({
             if (mutation.type == "childList") {
                 for (var i = 0; i < mutation.addedNodes.length; i++) {
                     if (mutation.addedNodes[i].className != telLinkerClassName) {
-                        walkTheDom(mutation.addedNodes[i], handleNode);
+                        walkTheDOM(mutation.addedNodes[i], handleNode);
                     }
                 }
             }
