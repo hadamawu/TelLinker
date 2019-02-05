@@ -100,8 +100,19 @@ function handleNode(node) {
                     link.title = "Call: " + formattedPhoneText;
                     link.onclick = function() { 
                         if (settings.telLinkFormat.startsWith("http")) {
-                            var url = new URL(formattedPhoneNumber);
-                            DoCall(url.toString());
+                            var numberString = formattedPhoneNumber;
+                            var url = new URL(numberString);
+                            //this feels stupidly hacky but it seems to get the job done so.. lets do it?
+                            var urlString = url.protocol + "//" + url.hostname + url.pathname;
+                            numberString = numberString.replace(urlString, "").replace("?", "");
+                            var parts = numberString.split("=");
+                            if (parts.length > 0) {
+                                urlString += "?";
+                                for (var i = 0; i < parts.length; i+=2) {
+                                    urlString += parts[i] + "=" + encodeURIComponent(parts[i+1]);
+                                }
+                            }
+                            DoCall(urlString);
                         } else {
                             DoCall(formattedPhoneNumber);
                         }

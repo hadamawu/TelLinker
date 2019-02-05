@@ -37,7 +37,19 @@ chrome.contextMenus.onClicked.addListener(function (info, tab) {
             }
         }
         if (settings.telLinkFormat.startsWith("http")) {
-            chrome.tabs.update(tab.id, { url: new URL(settings.telLinkFormat.substring(0, settings.telLinkFormat.indexOf('{')) + selectedText) });
+            var numberString = settings.telLinkFormat.substring(0, settings.telLinkFormat.indexOf('{')) + selectedText;
+            var url = new URL(numberString);
+            //this feels stupidly hacky but it seems to get the job done so.. lets do it?
+            var urlString = url.protocol + "//" + url.hostname + url.pathname;
+            numberString = numberString.replace(urlString, "").replace("?", "");
+            var parts = numberString.split("=");
+            if (parts.length > 0) {
+                urlString += "?";
+                for (var i = 0; i < parts.length; i+=2) {
+                    urlString += parts[i] + "=" + encodeURIComponent(parts[i+1]);
+                }
+            }
+            chrome.tabs.update(tab.id, { url: urlString });
         } else {
             chrome.tabs.update(tab.id, { url: settings.telLinkFormat.substring(0, settings.telLinkFormat.indexOf('{')) + selectedText });
         }
