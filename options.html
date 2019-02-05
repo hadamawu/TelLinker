@@ -102,9 +102,14 @@
                 <button id="addMatchPattern">Add Phone Match Regex</button>
             </td>
         </tr>
+        <tr id="hiddenAddMatchField" style="visibility:hidden">
+            <td colspan="2" align="center">
+                <input type="text" id="addMatchField" style="border:1px solid #000;font-family:'Courier New'" /> <button id="addMatchFinalBtn">Add</button>
+            </td>
+        </tr>
         <tr id="matchPatternsTR">
             <td colspan="2">
-                Phone Match Patterns: <span style="position:relative;float:right;font-size:xx-small;font-style:italic;">click to delete</span><br />
+                Phone Match Patterns: <span style="position:relative;float:right;font-size:xx-small;font-style:italic;">click to delete</span><br>
                 <ul id="matchPatternsList"></ul>
             </td>
         </tr>
@@ -117,6 +122,7 @@
         <tr id="filteredURLSTR">
             <td colspan="2">
                 Filtered urls: <span style="position:relative;float:right;font-size:xx-small;font-style:italic;">click to delete</span><br />
+
                 <ul id="filteredURLList"></ul>
             </td>
         </tr>

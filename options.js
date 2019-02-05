@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", function (event) {
     restore_options();
     document.getElementById("saveButton").addEventListener("click", saveOptions);
-    document.getElementById("addMatchPattern").addEventListener("click", addMatchPattern);
+    document.getElementById("addMatchPattern").addEventListener("click", addMatchPattern); 
+    document.getElementById("addMatchFinalBtn").addEventListener("click", addMatchFinal);
 });
 
 var settings = null;
@@ -24,15 +25,14 @@ function saveOptions() {
     });
 }
 function addMatchPattern() {
-    var status = document.getElementById("status");
-    status.textContent = "Options Saved";
-    setTimeout(function () {
-        status.innerHTML = "&nbsp;";
-    }, 750);
-        /*var newPattern = window.prompt("Please enter new match pattern:", "");
+    document.getElementById("hiddenAddMatchField").style.visibility = "visible";
+}
+function addMatchFinal() {
+    var newPattern = document.getElementById("addMatchField").value;
     if (newPattern != null && newPattern != "") {
+        document.getElementById("matchPatternsTR").style.visibility = "visible";
         settings.matchPatterns.push(newPattern);
-        var listDOM = document.getElementById("matchPatternsTR");
+        var listDOM = document.getElementById("matchPatternsList");
         var item = document.createElement("li");
         var hideButton = document.createElement("div");
         hideButton.className = "hide-button";
@@ -42,7 +42,20 @@ function addMatchPattern() {
         item.appendChild(document.createTextNode(decodeURI(newPattern)));
         listDOM.appendChild(item);
         item.onclick = removeMatchPatern;
-    }*/
+    }
+    document.getElementById("addMatchField").value = "";
+    document.getElementById("hiddenAddMatchField").style.visibility = "hidden";
+
+    chrome.storage.local.set({
+        matchPatterns: settings.matchPatterns,
+    }, function () {
+        // Update status to let user know options were saved.
+        var status = document.getElementById("status");
+        status.textContent = "Pattern Added";
+        setTimeout(function () {
+            status.innerHTML = "&nbsp;";
+        }, 750);
+    });
 }
 function restore_options() {
     chrome.storage.local.get({
@@ -58,9 +71,9 @@ function restore_options() {
         document.getElementById("linkTextFormat").value = items.linkTextFormat;
         document.getElementById("overrideLinks").checked = items.overrideLinks;
 
-        restoreList(settings.ignoredDomains, "filteredDomainsTR", removeDomain);
-        restoreList(settings.ignoredURLS, "filteredURLSTR", removeURL);
-        restoreList(settings.matchPatterns, "matchPatternsTR", removeMatchPatern);
+        restoreList(settings.ignoredDomains, "filteredDomainsTR", "filteredDomainsList", removeDomain);
+        restoreList(settings.ignoredURLS, "filteredURLSTR", "filteredURLList", removeURL);
+        restoreList(settings.matchPatterns, "matchPatternsTR", "matchPatternsList", removeMatchPatern);
     });
 }
 function removeMatchPatern(event) {
@@ -96,12 +109,12 @@ function removeURL(event) {
             document.getElementById("filteredURLSTR").remove();
     });
 }
-function restoreList(list, htmlID, removalFunction)
+function restoreList(list, htmlID, htmlListID, removalFunction)
 {
     if (list.length == 0) {
         document.getElementById(htmlID).remove();
     } else {
-        var listDOM = document.getElementById(htmlID);
+        var listDOM = document.getElementById(htmlListID);
         for (var i = 0; i < list.length; i++) {
             var item = document.createElement("li");
             var hideButton = document.createElement("div");
