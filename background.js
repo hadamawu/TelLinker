@@ -16,10 +16,51 @@ chrome.runtime.onInstalled.addListener(function() {
     });
 });
 
+chrome.contextMenus.onClicked.addListener(function (info, tab) {
+    var phoneNumberPattern = /([\s:]|\d+(?:-|\.)|^)\(?(\d{3})\)?[- \.]?(\d{3})[- \.]?(\d{4})(?=<|\s|$)/g;
+    var phoneNumberRegex = new RegExp(phoneNumberPattern);
+
+    var selectedText = info.selectionText;
+    chrome.storage.local.get({
+        telLinkFormat: defaultTelFormat,
+        matchPatterns: ["(?:[\\s:]|\\d+(?:-|\\.)|^)\\(?(\\d{3})\\)?[- \\.]?(\\d{3})[- \\.]?(\\d{4})(?=<|\\s|$)"]
+    }, function (settings) {
+        for (var i = 0; i < matchPatterns.length; i++) {
+            var phoneRegex = new RegExp(matchPatterns[i], "g");
+            if (phoneRegex.test(selectedText)) {
+                var matches = selectedText.match(phoneRegex);
+                var formattedTel = settings.telLinkFormat.format(matches);
+                if (formattedTel.startsWith("http")) {
+                    var urlObj = new URL(formattedTel);
+                    chrome.tabs.update(tab.id, { url: urlObj });
+                } else {
+                    chrome.tabs.update(tab.id, { url: formattedTel });
+                }
+                return;
+            }
+        }
+        if (settings.telLinkFormat.startsWith("http")) {
+            chrome.tabs.update(tab.id, { url: new URL(settings.telLinkFormat.substring(0, settings.telLinkFormat.indexOf('{')) + selectedText) });
+        } else {
+            chrome.tabs.update(tab.id, { url: settings.telLinkFormat.substring(0, settings.telLinkFormat.indexOf('{')) + selectedText });
+        }
+    });
+
+});
+
 
 if (!String.prototype.format) {
     String.prototype.format = function () {
-        var args = arguments;
+        var args = []; //arguments;
+        for (var i = 0; i < arguments.length; i++) {
+            if (arguments[i].constructor == Array) {
+                for (var j = 0; j < arguments[i].length; j++) {
+                    args.push(arguments[i][j]);
+                }
+            } else {
+                args.push(arguments[i]);
+            }
+        }
         return this.replace(/{(\d+)}/g, function (match, number) {
             return typeof args[number] != 'undefined'
               ? args[number]
