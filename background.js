@@ -17,16 +17,13 @@ chrome.runtime.onInstalled.addListener(function() {
 });
 
 chrome.contextMenus.onClicked.addListener(function (info, tab) {
-    var phoneNumberPattern = /([\s:]|\d+(?:-|\.)|^)\(?(\d{3})\)?[- \.]?(\d{3})[- \.]?(\d{4})(?=<|\s|$)/g;
-    var phoneNumberRegex = new RegExp(phoneNumberPattern);
-
     var selectedText = info.selectionText;
     chrome.storage.local.get({
         telLinkFormat: defaultTelFormat,
         matchPatterns: ["(?:[\\s:]|\\d+(?:-|\\.)|^)\\(?(\\d{3})\\)?[- \\.]?(\\d{3})[- \\.]?(\\d{4})(?=<|\\s|$)"]
     }, function (settings) {
-        for (var i = 0; i < matchPatterns.length; i++) {
-            var phoneRegex = new RegExp(matchPatterns[i], "g");
+        for (var i = 0; i < settings.matchPatterns.length; i++) {
+            var phoneRegex = new RegExp(settings.matchPatterns[i], "g");
             if (phoneRegex.test(selectedText)) {
                 var matches = selectedText.match(phoneRegex);
                 var formattedTel = settings.telLinkFormat.format(matches);
