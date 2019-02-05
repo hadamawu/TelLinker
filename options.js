@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", function (event) {
     restore_options();
-    document.getElementById("saveButton").addEventListener("click", save_options);
+    document.getElementById("saveButton").addEventListener("click", saveOptions);
+    document.getElementById("addMatchPattern").addEventListener("click", addMatchPattern);
 });
 
 var settings = null;
 
-function save_options() {
+function saveOptions() {
     var linkFormatValue = document.getElementById("telLinkFormat").value;
     var linkTextFormatValue = document.getElementById("linkTextFormat").value;
     var overrideValue = document.getElementById("overrideLinks").checked;
@@ -22,70 +23,58 @@ function save_options() {
         }, 750);
     });
 }
-
-
+function addMatchPattern() {
+    var status = document.getElementById("status");
+    status.textContent = "Options Saved";
+    setTimeout(function () {
+        status.innerHTML = "&nbsp;";
+    }, 750);
+        /*var newPattern = window.prompt("Please enter new match pattern:", "");
+    if (newPattern != null && newPattern != "") {
+        settings.matchPatterns.push(newPattern);
+        var listDOM = document.getElementById("matchPatternsTR");
+        var item = document.createElement("li");
+        var hideButton = document.createElement("div");
+        hideButton.className = "hide-button";
+        hideButton.appendChild(document.createTextNode("X"));
+        item.title = newPattern;
+        item.appendChild(hideButton);
+        item.appendChild(document.createTextNode(decodeURI(newPattern)));
+        listDOM.appendChild(item);
+        item.onclick = removeMatchPatern;
+    }*/
+}
 function restore_options() {
     chrome.storage.local.get({
-        telLinkFormat: "tel:+1-{1}-{2}-{3}",
-        linkTextFormat: "{0}",
+        telLinkFormat: "",
+        linkTextFormat: "",
         overrideLinks: true,
         ignoredDomains: [],
-        ignoredURLS: []
+        ignoredURLS: [],
+        matchPatterns: []
     }, function (items) {
         settings = items;
         document.getElementById("telLinkFormat").value = items.telLinkFormat;
         document.getElementById("linkTextFormat").value = items.linkTextFormat;
         document.getElementById("overrideLinks").checked = items.overrideLinks;
 
-        restoreDomains();
-        restoreURLS();
+        restoreList(settings.ignoredDomains, "filteredDomainsTR", removeDomain);
+        restoreList(settings.ignoredURLS, "filteredURLSTR", removeURL);
+        restoreList(settings.matchPatterns, "matchPatternsTR", removeMatchPatern);
     });
 }
-
-function restoreDomains()
-{
-    if (settings.ignoredDomains.length == 0) {
-        document.getElementById("filteredDomainsTR").remove();
-    }
-    else {
-        var domainList = document.getElementById("filteredDomainsList");
-        for (var i = 0; i < settings.ignoredDomains.length; i++) {
-            var item = document.createElement("li");
-            var hideButton = document.createElement("div");
-            hideButton.className = "hide-button";
-            hideButton.appendChild(document.createTextNode("X"));
-            item.title = settings.ignoredDomains[i];
-            item.appendChild(hideButton);
-            item.appendChild(document.createTextNode(decodeURI(settings.ignoredDomains[i])));
-            domainList.appendChild(item);
-            item.onclick = handleDomainRemoval;
-        }
-    }
+function removeMatchPatern(event) {
+    var data = event.target.textContent.substring(1);
+    settings.matchPatterns.splice(settings.matchPatterns.indexOf(data), 1);
+    chrome.storage.local.set({
+        matchPatterns: settings.matchPatterns
+    }, function () {
+        event.target.remove();
+        if (settings.matchPatterns.length == 0)
+            document.getElementById("matchPatternsTR").remove();
+    });
 }
-
-function restoreURLS()
-{
-    if (settings.ignoredURLS.length == 0) {
-        document.getElementById("filteredURLSTR").remove();
-    }
-    else {
-        var urlList = document.getElementById("filteredURLList");
-        for (var i = 0; i < settings.ignoredURLS.length; i++) {
-            var item = document.createElement("li");
-            var hideButton = document.createElement("div");
-            hideButton.className = "hide-button";
-            hideButton.appendChild(document.createTextNode("X"));
-            item.title = settings.ignoredURLS[i];
-            item.appendChild(hideButton);
-            item.appendChild(document.createTextNode(decodeURI(settings.ignoredURLS[i])));
-            urlList.appendChild(item);
-            item.onclick = handleURLRemoval;
-        }
-    }
-}
-
-function handleDomainRemoval(event)
-{
+function removeDomain(event) {
     var data = event.target.textContent.substring(1);
     settings.ignoredDomains.splice(settings.ignoredDomains.indexOf(data), 1);
     chrome.storage.local.set({
@@ -96,9 +85,7 @@ function handleDomainRemoval(event)
             document.getElementById("filteredDomainsTR").remove();
     });
 }
-
-function handleURLRemoval(event)
-{
+function removeURL(event) {
     var data = event.target.textContent.substring(1);
     settings.ignoredURLS.splice(settings.ignoredURLS.indexOf(data), 1);
     chrome.storage.local.set({
@@ -108,4 +95,23 @@ function handleURLRemoval(event)
         if (settings.ignoredURLS.length == 0)
             document.getElementById("filteredURLSTR").remove();
     });
+}
+function restoreList(list, htmlID, removalFunction)
+{
+    if (list.length == 0) {
+        document.getElementById(htmlID).remove();
+    } else {
+        var listDOM = document.getElementById(htmlID);
+        for (var i = 0; i < list.length; i++) {
+            var item = document.createElement("li");
+            var hideButton = document.createElement("div");
+            hideButton.className = "hide-button";
+            hideButton.appendChild(document.createTextNode("X"));
+            item.title = list[i];
+            item.appendChild(hideButton);
+            item.appendChild(document.createTextNode(decodeURI(list[i])));
+            listDOM.appendChild(item);
+            item.onclick = removalFunction;
+        }
+    }
 }
