@@ -41,7 +41,7 @@ chrome.storage.local.get({
     useCustom: [],
     customTel: [],
     customText: [],
-    matchPatterns: []
+    matchPatterns: ["(?:[\\s:]|\\d+(?:-|\\.)|^)\\(?(\\d{3})\\)?[- \\.]?(\\d{3})[- \\.]?(\\d{4})(?=<|\\s|$)"]
 }, function (scopedSettings) {
     settings = scopedSettings;
     if (settings.matchPatterns.length == 0)

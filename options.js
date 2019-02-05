@@ -64,7 +64,7 @@ function restore_options() {
         overrideLinks: true,
         ignoredDomains: [],
         ignoredURLS: [],
-        matchPatterns: []
+        matchPatterns: ["(?:[\\s:]|\\d+(?:-|\\.)|^)\\(?(\\d{3})\\)?[- \\.]?(\\d{3})[- \\.]?(\\d{4})(?=<|\\s|$)"]
     }, function (items) {
         settings = items;
         document.getElementById("telLinkFormat").value = items.telLinkFormat;
