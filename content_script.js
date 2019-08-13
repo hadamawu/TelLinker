@@ -98,26 +98,24 @@ function handleNode(node) {
                     link.href = "javascript:void(0);";
                     link.appendChild(document.createTextNode(formattedPhoneText));
                     link.title = "Call: " + formattedPhoneText;
-                    link.onclick = function() { 
-                        if (settings.telLinkFormat.startsWith("http")) {
-                            var numberString = formattedPhoneNumber;
-                            var url = new URL(numberString);
-                            //this feels stupidly hacky but it seems to get the job done so.. lets do it?
-                            var urlString = url.protocol + "//" + url.hostname + url.pathname;
-                            numberString = numberString.replace(urlString, "").replace("?", "");
-                            var parts = numberString.split("=");
-                            if (parts.length > 0) {
-                                urlString += "?";
-                                for (var i = 0; i < parts.length; i+=2) {
-                                    if (i > 0) urlString += "&";
-                                    urlString += parts[i] + "=" + encodeURIComponent(parts[i+1]);
-                                }
-                            }
-                            DoCall(urlString);
-                        } else {
-                            DoCall(formattedPhoneNumber);
-                        }
-                    };
+					if (settings.telLinkFormat.startsWith("http")) {
+						var numberString = formattedPhoneNumber;
+						var url = new URL(numberString);
+						//this feels stupidly hacky but it seems to get the job done so.. lets do it?
+						var urlString = url.protocol + "//" + url.hostname + url.pathname;
+						numberString = numberString.replace(urlString, "").replace("?", "");
+						var parts = numberString.split("=");
+						if (parts.length > 0) {
+							urlString += "?";
+							for (var i = 0; i < parts.length; i+=2) {
+								if (i > 0) urlString += "&";
+								urlString += parts[i] + "=" + encodeURIComponent(parts[i+1]);
+							}
+						}
+						link.href = urlString
+					} else {
+						link.onclick = function () { DoCall(formattedPhoneNumber); };
+					}
                     newNode.appendChild(link);
                 }
             }
